@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SurfaceOS — Proposal for Acuity Brands</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ── Tokens ── */
+:root{
+  --ink:#0a0a0a;
+  --ink-2:#525252;
+  --ink-3:#a3a3a3;
+  --ink-4:#d4d4d4;
+  --border:#e5e5e5;
+  --bg:#ffffff;
+  --bg-s:#fafafa;
+  --bg-ss:#f4f4f5;
+  --accent:#0052cc;
+  --accent-l:#eff4ff;
+  --accent-d:#003d99;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --mw:1200px;
+  --r:8px;
+}
+
+body{font-family:var(--font);color:var(--ink);background:var(--bg);font-size:17px;line-height:1.7;overflow-x:hidden}
+
+/* ── Layout ── */
+.wrap{max-width:var(--mw);margin:0 auto;padding:0 40px}
+.wrap-wide{max-width:1520px;margin:0 auto;padding:0 32px}
+section{padding:120px 0}
+
+/* ── Type ── */
+h1{font-size:clamp(44px,5.2vw,70px);font-weight:800;letter-spacing:-2.5px;line-height:1.05}
+h2{font-size:clamp(30px,3.2vw,46px);font-weight:700;letter-spacing:-1.5px;line-height:1.1}
+h3{font-size:20px;font-weight:700;letter-spacing:-0.5px;line-height:1.3}
+
+.mono{font-family:var(--mono)}
+.label-tag{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-3)}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ══════════════════
+   HEADER
+══════════════════ */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;transition:background .2s,box-shadow .2s}
+#hdr.solid{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--border)}
+.hdr-inner{max-width:var(--mw);margin:0 auto;padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink)}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mono);font-size:13px;font-weight:700;flex-shrink:0}
+.logo-name{font-size:16px;font-weight:700;letter-spacing:-.4px}
+.hdr-nav{display:flex;align-items:center;gap:28px}
+.hdr-nav a{font-size:13.5px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:color .15s}
+.hdr-nav a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:var(--r);font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s;border:1.5px solid transparent;font-family:var(--font);letter-spacing:-.1px}
+.btn-p{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-p:hover{background:var(--accent-d);border-color:var(--accent-d)}
+.btn-s{background:transparent;color:var(--ink);border-color:var(--border)}
+.btn-s:hover{border-color:#a3a3a3}
+.btn-lg{padding:13px 26px;font-size:15px}
+.btn-xl{padding:17px 34px;font-size:16px}
+.btn-inv{background:#fff;color:var(--ink);border-color:#fff}
+.btn-inv:hover{background:rgba(255,255,255,.9)}
+
+/* ══════════════════
+   HERO
+══════════════════ */
+#hero{min-height:88vh;display:flex;align-items:center;padding-top:60px;background:var(--bg)}
+.hero-g{display:grid;grid-template-columns:56% 44%;gap:80px;align-items:center;width:100%}
+.hero-eye{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.hero-eye-line{width:24px;height:1.5px;background:var(--accent)}
+.hero-eye-txt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+.hero-h1{margin-bottom:6px}
+.hero-for{font-family:var(--mono);font-size:13px;color:var(--ink-3);margin-bottom:28px}
+.hero-tagline{font-size:clamp(20px,2.2vw,28px);font-weight:600;letter-spacing:-.6px;line-height:1.35;color:var(--ink);margin-bottom:18px}
+.hero-body{font-size:17px;color:var(--ink-2);line-height:1.75;margin-bottom:36px;max-width:500px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+
+/* ── Stats strip ── */
+.stats-strip{background:var(--bg-s);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:28px 0}
+.stats-g{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-it{text-align:center;padding:0 24px;border-right:1px solid var(--border)}
+.stat-it:last-child{border-right:none}
+.stat-n{font-family:var(--mono);font-size:34px;font-weight:600;color:var(--ink);letter-spacing:-1.5px;display:block;margin-bottom:4px}
+.stat-l{font-size:13px;color:var(--ink-3)}
+
+/* ══════════════════
+   SECTION HEADER
+══════════════════ */
+.s-hdr{margin-bottom:64px}
+.s-hdr .label-tag{display:block;margin-bottom:14px}
+.s-intro{font-size:18px;color:var(--ink-2);line-height:1.75;max-width:660px;margin-top:20px}
+
+/* ══════════════════
+   PROBLEMA
+══════════════════ */
+#problema{background:var(--bg)}
+.prob-g{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:64px}
+.prob-blk{padding:36px;background:var(--bg-s);border:1px solid var(--border);border-radius:var(--r)}
+.prob-num{font-family:var(--mono);font-size:44px;font-weight:600;color:var(--accent);letter-spacing:-2px;line-height:1;display:block;margin-bottom:20px}
+.prob-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:12px;line-height:1.4;letter-spacing:-.2px}
+.prob-body{font-size:15px;color:var(--ink-2);line-height:1.75}
+
+/* ══════════════════
+   SOLUCIÓN
+══════════════════ */
+#solucion{background:var(--bg-s)}
+.pilar-g{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:64px}
+.pilar{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:36px;position:relative;overflow:hidden}
+.pilar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:var(--r) var(--r) 0 0}
+.pilar-ico{width:40px;height:40px;background:var(--accent-l);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:20px;border:1px solid rgba(0,82,204,.12)}
+.pilar-t{font-size:17px;font-weight:700;letter-spacing:-.4px;margin-bottom:12px}
+.pilar-b{font-size:15px;color:var(--ink-2);line-height:1.75}
+
+/* ══════════════════
+   DEMO
+══════════════════ */
+#demo{background:var(--bg)}
+.demo-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;color:var(--accent);background:var(--accent-l);border:1px solid rgba(0,82,204,.2);padding:6px 14px;border-radius:9999px;margin-bottom:28px}
+.demo-badge-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.35}}
+.demo-frame{border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.07);margin-top:4px}
+.demo-bar{background:var(--bg-s);border-bottom:1px solid var(--border);padding:11px 16px;display:flex;align-items:center;gap:7px}
+.d-dot{width:10px;height:10px;border-radius:50%}
+.demo-url{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-left:10px}
+.demo-frame iframe{width:100%;height:780px;display:block;border:none}
+
+/* ══════════════════
+   IMPLEMENTACIÓN
+══════════════════ */
+#impl{background:var(--bg-s)}
+.impl-tbl{margin-top:64px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg)}
+.impl-row{display:grid;grid-template-columns:190px 1fr 130px 110px;border-bottom:1px solid var(--border)}
+.impl-row.impl-hdr{background:var(--bg-ss)}
+.impl-row:last-child{border-bottom:none}
+.impl-cell{padding:22px 26px;border-right:1px solid var(--border);font-size:14px}
+.impl-cell:last-child{border-right:none}
+.impl-lname{font-weight:700;font-size:15px;margin-bottom:4px;letter-spacing:-.2px}
+.impl-ltype{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:500;letter-spacing:.5px}
+.vtag{display:inline-flex;align-items:center;background:var(--bg-ss);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-family:var(--mono);font-size:10.5px;color:var(--ink-2);margin:2px}
+.impl-big{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--accent);display:block;margin-bottom:2px;letter-spacing:-1px}
+.impl-sub{font-size:12px;color:var(--ink-3)}
+.impl-totals{display:flex;justify-content:flex-end;gap:48px;margin-top:16px;padding:20px 28px;background:var(--accent-l);border:1px solid rgba(0,82,204,.14);border-radius:var(--r)}
+.tot-it{text-align:center}
+.tot-n{font-family:var(--mono);font-size:32px;font-weight:600;color:var(--accent);letter-spacing:-1px;display:block;margin-bottom:2px}
+.tot-l{font-size:13px;color:var(--ink-2)}
+
+/* ══════════════════
+   ROADMAP
+══════════════════ */
+#roadmap{background:var(--bg)}
+.tl{margin-top:80px;position:relative}
+.tl-line{position:absolute;top:23px;left:16.66%;right:16.66%;height:2px;background:var(--border)}
+.tl-g{display:grid;grid-template-columns:repeat(3,1fr);gap:52px;position:relative}
+.phase{text-align:center}
+.ph-dot{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-family:var(--mono);font-size:16px;font-weight:600;color:var(--ink-3);position:relative;z-index:1;transition:all .3s}
+.ph-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.ph-dot.next{background:var(--bg-s);border-color:var(--accent);color:var(--accent)}
+.ph-period{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+.ph-title{font-size:20px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
+.ph-sub{font-size:14px;color:var(--ink-2);margin-bottom:16px;line-height:1.6}
+.ph-list{list-style:none;text-align:left;background:var(--bg-s);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px}
+.ph-list li{font-size:13.5px;color:var(--ink-2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.ph-list li:last-child{border-bottom:none}
+.ph-list li::before{content:'→';color:var(--accent);font-weight:600;font-size:11px;flex-shrink:0;margin-top:3px}
+
+/* ══════════════════
+   ROLES
+══════════════════ */
+#roles{background:var(--bg-s)}
+.roles-g{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:64px}
+.role-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:36px}
+.role-badge{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:18px}
+.rb-dir{background:rgba(0,82,204,.08);color:var(--accent)}
+.rb-cal{background:rgba(0,96,74,.08);color:#00604a}
+.rb-op{background:rgba(120,53,15,.07);color:#92400e}
+.role-t{font-size:18px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+.role-p{font-size:13px;color:var(--ink-3);font-style:italic;margin-bottom:20px}
+.role-pts{list-style:none}
+.role-pts li{font-size:14.5px;color:var(--ink-2);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.role-pts li:last-child{border-bottom:none}
+.role-pts li::before{content:'✓';color:var(--accent);font-weight:700;font-size:12px;flex-shrink:0;margin-top:3px}
+
+/* ══════════════════
+   CTA FINAL
+══════════════════ */
+#cta-final{background:var(--ink);padding:120px 0}
+#cta-final .wrap{text-align:center}
+.cta-eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:block;margin-bottom:24px}
+#cta-final h2{color:#fff;margin-bottom:22px}
+.cta-body{font-size:18px;color:rgba(255,255,255,.55);max-width:580px;margin:0 auto 48px;line-height:1.75}
+.cta-note{margin-top:18px;font-size:13.5px;color:rgba(255,255,255,.3)}
+.contacts{margin-top:52px;padding-top:40px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:center;gap:52px;flex-wrap:wrap}
+.ct-it{text-align:center}
+.ct-l{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.25);letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:6px}
+.ct-v{font-size:15px;color:rgba(255,255,255,.75);font-weight:500}
+.ct-v a{color:inherit;text-decoration:none}
+.ct-v a:hover{color:#fff}
+
+/* ══════════════════
+   FOOTER
+══════════════════ */
+footer{background:#050505;padding:28px 0;border-top:1px solid rgba(255,255,255,.05)}
+.ft-in{max-width:var(--mw);margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.ft-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.ft-copy{font-size:13px;color:rgba(255,255,255,.25)}
+.ft-line{font-size:13px;color:rgba(255,255,255,.2);max-width:380px;text-align:right}
+
+/* ══════════════════
+   MODAL
+══════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(5px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:14px;padding:44px;max-width:500px;width:90%;position:relative;transform:translateY(18px);transition:transform .22s;max-height:92vh;overflow-y:auto}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-x{position:absolute;top:18px;right:18px;width:32px;height:32px;background:var(--bg-s);border:1px solid var(--border);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink-2);font-family:inherit;transition:all .15s}
+.modal-x:hover{background:var(--border)}
+.modal-h{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.modal-sub{font-size:14px;color:var(--ink-2);margin-bottom:30px;line-height:1.6}
+.fg{margin-bottom:18px}
+.fl{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.fi,.ft{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14.5px;font-family:var(--font);color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s}
+.fi:focus,.ft:focus{border-color:var(--accent)}
+.ft{resize:vertical;min-height:90px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ══════════════════
+   ANIMATIONS
+══════════════════ */
+.fu{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease}
+.fu.in{opacity:1;transform:translateY(0)}
+.fu-1{transition-delay:.08s}
+.fu-2{transition-delay:.16s}
+.fu-3{transition-delay:.24s}
+
+/* ══════════════════
+   HAMBURGER
+══════════════════ */
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none}
+.ham span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;transition:all .25s}
+.ham.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob-nav{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:20px 24px;z-index:99;flex-direction:column;gap:4px}
+.mob-nav.open{display:flex}
+.mob-nav a{font-size:15px;font-weight:500;color:var(--ink-2);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--border)}
+.mob-nav a:last-child{border-bottom:none}
+.mob-nav .btn{margin-top:10px;width:100%;justify-content:center}
+
+/* ══════════════════
+   RESPONSIVE
+══════════════════ */
+@media(max-width:900px){
+  .hdr-nav{display:none}
+  .ham{display:flex}
+  .wrap,.wrap-wide{padding:0 24px}
+  .hdr-inner{padding:0 24px}
+  section{padding:80px 0}
+  h1{letter-spacing:-1.5px}
+  h2{letter-spacing:-1px}
+
+  /* Hero */
+  #hero{padding:100px 0 60px;min-height:auto}
+  .hero-g{grid-template-columns:1fr;gap:0}
+  .hero-g>div:last-child{display:none}
+  .hero-body{max-width:100%}
+  .hero-ctas{flex-direction:column;gap:10px}
+  .hero-ctas .btn{width:100%;justify-content:center}
+
+  /* Problema */
+  .prob-g{grid-template-columns:1fr;gap:14px;margin-top:40px}
+  .prob-blk{padding:24px}
+
+  /* Solución */
+  .pilar-g{grid-template-columns:1fr;gap:14px;margin-top:40px}
+  .pilar{padding:24px}
+
+  /* Demo */
+  .demo-frame iframe{height:640px}
+  .demo-url{display:none}
+
+  /* Implementación */
+  .impl-tbl{overflow-x:auto;display:block}
+  .impl-row{min-width:640px}
+  .impl-totals{justify-content:center;gap:28px;flex-wrap:wrap}
+
+  /* Roadmap */
+  .tl-line{display:none}
+  .tl-g{grid-template-columns:1fr;gap:36px}
+  .phase{text-align:left;display:grid;grid-template-columns:48px 1fr;grid-template-rows:auto auto auto;column-gap:18px}
+  .ph-dot{margin:0;grid-row:1/3}
+  .ph-period{grid-column:2}
+  .ph-title{grid-column:2}
+  .ph-sub{grid-column:1/-1;margin-top:8px}
+  .ph-list{grid-column:1/-1}
+
+  /* Roles */
+  .roles-g{grid-template-columns:1fr;gap:14px;margin-top:40px}
+  .role-card{padding:24px}
+
+  /* CTA */
+  .cta-body{font-size:16px}
+  .contacts{gap:28px;flex-direction:column;align-items:center}
+
+  /* Footer */
+  .ft-in{flex-direction:column;text-align:center;gap:10px;padding:0 24px}
+  .ft-line{text-align:center;max-width:100%}
+
+  /* Modal */
+  .modal{padding:28px 22px}
+  .f2{grid-template-columns:1fr}
+
+  /* S header */
+  .s-hdr{margin-bottom:40px}
+  .s-intro{font-size:16px}
+}
+
+@media(max-width:480px){
+  .wrap,.wrap-wide{padding:0 16px}
+  .hdr-inner{padding:0 16px}
+  section{padding:64px 0}
+  .btn-xl{padding:14px 24px;font-size:15px}
+  .demo-frame iframe{height:560px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+  HEADER
+══════════════════════════════════════ -->
+<header id="hdr">
+  <div class="hdr-inner">
+    <a href="#" class="logo">
+      <div class="logo-mark">◈</div>
+      <span class="logo-name">SurfaceOS</span>
+    </a>
+    <nav class="hdr-nav">
+      <a href="#problema">Problem</a>
+      <a href="#solucion">Solution</a>
+      <a href="#demo">Demo</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#cta-final">Proposal</a>
+      <button class="btn btn-p" onclick="openModal()">Schedule a visit</button>
+    </nav>
+    <button class="ham" id="hamBtn" aria-label="Menú" onclick="toggleHam()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mob-nav" id="mobNav">
+  <a href="#problema" onclick="closeHam()">Problem</a>
+  <a href="#solucion" onclick="closeHam()">Solution</a>
+  <a href="#demo" onclick="closeHam()">Demo</a>
+  <a href="#roadmap" onclick="closeHam()">Roadmap</a>
+  <a href="#cta-final" onclick="closeHam()">Proposal</a>
+  <button class="btn btn-p" onclick="closeHam();openModal()">Schedule a visit</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+  HERO
+══════════════════════════════════════ -->
+<section id="hero">
+  <div class="wrap">
+    <div class="hero-g">
+      <div>
+        <div class="hero-eye">
+          <span class="hero-eye-line"></span>
+          <span class="hero-eye-txt">Exclusive proposal · 2026</span>
+        </div>
+        <h1 class="hero-h1">Proposal for<br>Acuity Brands</h1>
+        <p class="hero-for mono">Prepared exclusively for the Finishing Operations team</p>
+        <p class="hero-tagline">El operador digital para sus líneas de tratamiento de superficies.</p>
+        <p class="hero-body">Captures the knowledge of your expert operators, monitors your 2 coating lines in real time, and eliminates the single-person dependency that puts every shift at risk.</p>
+        <div class="hero-ctas">
+          <a href="#demo" class="btn btn-p btn-lg">See live demo</a>
+          <a href="#cta-final" class="btn btn-s btn-lg">Read full proposal</a>
+        </div>
+      </div>
+
+      <!-- SVG Technical Illustration -->
+      <div>
+        <svg viewBox="0 0 460 380" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-height:420px" aria-hidden="true">
+          <defs>
+            <pattern id="gr" width="28" height="28" patternUnits="userSpaceOnUse">
+              <path d="M28 0L0 0 0 28" fill="none" stroke="#e5e5e5" stroke-width=".6"/>
+            </pattern>
+          </defs>
+          <!-- Grid bg -->
+          <rect width="460" height="380" fill="url(#gr)" rx="10"/>
+
+          <!-- GT100 Gateway -->
+          <rect x="160" y="32" width="140" height="60" rx="8" fill="#fff" stroke="#0052cc" stroke-width="1.5"/>
+          <rect x="160" y="32" width="140" height="20" rx="8" fill="#0052cc"/>
+          <rect x="160" y="44" width="140" height="8" fill="#0052cc"/>
+          <text x="230" y="46" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#fff" font-weight="600" letter-spacing="1">GATEWAY GT100</text>
+          <text x="230" y="68" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#525252">18 sensores activos</text>
+          <text x="230" y="83" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#22c55e">● SurfaceOS Cloud</text>
+
+          <!-- Main horizontal pipeline -->
+          <line x1="28" y1="190" x2="432" y2="190" stroke="#e5e5e5" stroke-width="2.5"/>
+
+          <!-- Animated flow dot -->
+          <circle r="4.5" fill="#0052cc" opacity=".6">
+            <animateMotion dur="4s" repeatCount="indefinite" calcMode="linear">
+              <mpath href="#flow"/>
+            </animateMotion>
+          </circle>
+          <path id="flow" d="M 28 190 L 432 190" fill="none"/>
+
+          <!-- Stage 1: Desengrase -->
+          <rect x="18" y="168" width="56" height="44" rx="6" fill="#fff" stroke="#e5e5e5" stroke-width="1.5"/>
+          <text x="46" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#a3a3a3">DSGRS</text>
+          <text x="46" y="196" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#0a0a0a">pH</text>
+          <text x="46" y="207" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#0052cc">10.4</text>
+
+          <!-- Stage 2: Enjuague 1 -->
+          <rect x="96" y="168" width="56" height="44" rx="6" fill="#fff" stroke="#e5e5e5" stroke-width="1.5"/>
+          <text x="124" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#a3a3a3">ENJ·1</text>
+          <text x="124" y="196" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" fill="#0a0a0a">µS/cm</text>
+          <text x="124" y="207" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#0052cc">380</text>
+
+          <!-- Stage 3: Fosfatado (ALERT) -->
+          <rect x="176" y="162" width="62" height="56" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+          <circle cx="230" cy="169" r="6" fill="#f59e0b"/>
+          <text x="230" y="172.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#fff" font-weight="700">!</text>
+          <text x="207" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#92400e">FOSFT</text>
+          <text x="207" y="196" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#0a0a0a">pH</text>
+          <text x="207" y="208" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f59e0b" font-weight="700">5.32↑</text>
+
+          <!-- Stage 4: Enjuague DI -->
+          <rect x="260" y="168" width="56" height="44" rx="6" fill="#fff" stroke="#e5e5e5" stroke-width="1.5"/>
+          <text x="288" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#a3a3a3">ENJ·DI</text>
+          <text x="288" y="196" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" fill="#0a0a0a">µS/cm</text>
+          <text x="288" y="207" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#22c55e">18 ✓</text>
+
+          <!-- Stage 5: Sello -->
+          <rect x="338" y="168" width="56" height="44" rx="6" fill="#fff" stroke="#e5e5e5" stroke-width="1.5"/>
+          <text x="366" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#a3a3a3">SELLO</text>
+          <text x="366" y="196" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#0a0a0a">pH</text>
+          <text x="366" y="207" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#0052cc">4.3</text>
+
+          <!-- Horno -->
+          <rect x="382" y="250" width="70" height="50" rx="6" fill="#fff" stroke="#ef4444" stroke-width="1.3" opacity=".8"/>
+          <text x="417" y="268" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#a3a3a3">HORNO</text>
+          <text x="417" y="281" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600" fill="#ef4444">198°C</text>
+          <text x="417" y="293" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#22c55e">PMT ✓</text>
+          <line x1="390" y1="250" x2="380" y2="212" stroke="#e5e5e5" stroke-width="1.5"/>
+
+          <!-- Connector lines: stages → gateway -->
+          <line x1="46"  y1="168" x2="185" y2="92" stroke="#0052cc" stroke-width=".9" stroke-dasharray="4,3" opacity=".25"/>
+          <line x1="124" y1="168" x2="200" y2="92" stroke="#0052cc" stroke-width=".9" stroke-dasharray="4,3" opacity=".25"/>
+          <line x1="207" y1="162" x2="222" y2="92" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="4,3" opacity=".55"/>
+          <line x1="288" y1="168" x2="248" y2="92" stroke="#0052cc" stroke-width=".9" stroke-dasharray="4,3" opacity=".25"/>
+          <line x1="366" y1="168" x2="285" y2="92" stroke="#0052cc" stroke-width=".9" stroke-dasharray="4,3" opacity=".25"/>
+
+          <!-- Alert callout for fosfatado -->
+          <rect x="110" y="234" width="130" height="38" rx="5" fill="#fffbeb" stroke="#f59e0b" stroke-width="1"/>
+          <text x="120" y="250" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#92400e">⚠ pH ascendente</text>
+          <text x="120" y="264" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#92400e">Ajuste recomendado</text>
+          <line x1="207" y1="218" x2="175" y2="234" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" opacity=".7"/>
+
+          <!-- Bottom label -->
+          <text x="230" y="364" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#d4d4d4" letter-spacing="1.5">SURFACEOS · LINE 1 — ACUITY BRANDS</text>
+          <line x1="32" y1="357" x2="118" y2="357" stroke="#e5e5e5" stroke-width="1"/>
+          <line x1="342" y1="357" x2="428" y2="357" stroke="#e5e5e5" stroke-width="1"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+  PROBLEMA
+══════════════════════════════════════ -->
+<section id="problema">
+  <div class="wrap">
+    <div class="s-hdr fu">
+      <span class="label-tag">The problem</span>
+      <h2>El conocimiento que opera sus líneas<br>hoy vive en una sola cabeza.</h2>
+      <p class="s-intro">En una operación de 950,000 toneladas anuales distribuidas en 30 plantas, la consistencia de sus procesos de tratamiento de superficies depende de operadores expertos que acumularon su conocimiento durante años. Ese conocimiento no está documentado. No se transfiere. Y cuando ese operador se va, se va con él.</p>
+    </div>
+    <div class="prob-g">
+      <div class="prob-blk fu fu-1">
+        <span class="prob-num">01</span>
+        <div class="prob-title">Expert leaves = line that wobbles</div>
+        <p class="prob-body">When the expert operator leaves (retirement, job change, rotation), the replacement takes 6 to 18 months to reach the same consistency level. During that time, scrap increases, customer complaints grow, and the line runs at reduced capacity.</p>
+      </div>
+      <div class="prob-blk fu fu-2">
+        <span class="prob-num">02</span>
+        <div class="prob-title">Static FMEA = dead FMEA</div>
+        <p class="prob-body">An FMEA in Excel or on paper goes stale in weeks. Failure modes evolve with every supplier change, every new part, every process adjustment. If the FMEA doesn't update itself with actual operations, it's not a quality tool — it's a compliance checkbox.</p>
+      </div>
+      <div class="prob-blk fu fu-3">
+        <span class="prob-num">03</span>
+        <div class="prob-title">Late detection = full lot compromised</div>
+        <p class="prob-body">The phosphate bath pH drifted at 10:17 am. At 11:42 am someone noticed. Those 85 minutes of parts are scrap or rework. By the time a defect is caught visually at the end of the line, 30 to 200 parts have already been processed under the same bad condition.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SOLUCIÓN
+══════════════════════════════════════ -->
+<section id="solucion">
+  <div class="wrap">
+    <div class="s-hdr fu">
+      <span class="label-tag">The solution</span>
+      <h2>SurfaceOS: your live FMEA, lot-level traceability,<br>and the operator who never leaves.</h2>
+      <p class="s-intro">SurfaceOS es un sistema de monitoreo industrial que captura, procesa y comunica el estado de sus líneas en tiempo real, convirtiendo el conocimiento tácito de sus mejores operadores en un activo digital permanente.</p>
+    </div>
+    <div class="pilar-g">
+      <div class="pilar fu fu-1">
+        <div class="pilar-ico">📡</div>
+        <h3 class="pilar-t">Real-time visibility</h3>
+        <p class="pilar-b">Critical variables at every stage (pH, temperature, voltage, chain speed, humidity, film thickness) monitored continuously. Leadership, quality, operations, and maintenance all see the same information from any device. For the first time, the complete status of your lines is visible without walking the floor.</p>
+      </div>
+      <div class="pilar fu fu-2">
+        <div class="pilar-ico">📋</div>
+        <h3 class="pilar-t">Live FMEA with lot-level traceability</h3>
+        <p class="pilar-b">Every failure event is documented with photo, process variables, affected parts, corrective action, and response time. The system learns from each incident. Every lot ships with an automatic process certificate: full traceability with no additional work from the quality team.</p>
+      </div>
+      <div class="pilar fu fu-3">
+        <div class="pilar-ico">🔔</div>
+        <h3 class="pilar-t">Smart notifications and measurable MTTR</h3>
+        <p class="pilar-b">When a variable goes out of range, the system calculates how many parts were processed under that condition, notifies the shift supervisor via WhatsApp, and records time from detection to corrective action. That MTTR becomes an operational KPI that was previously impossible to measure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  DEMO
+══════════════════════════════════════ -->
+<section id="demo">
+  <div class="wrap-wide">
+    <div class="s-hdr fu" style="margin-bottom:32px">
+      <span class="label-tag">Interactive demo</span>
+      <h2>This is what your lines look like<br>with SurfaceOS.</h2>
+      <p class="s-intro">A functional simulation of the dashboard with live data from a powder coating line. Values update in real time. All controls are interactive.</p>
+    </div>
+    <div class="fu">
+      <div class="demo-badge"><span class="demo-badge-dot"></span>Live demo — Simulated data</div>
+      <div class="demo-frame">
+        <div class="demo-bar">
+          <div class="d-dot" style="background:#ef4444"></div>
+          <div class="d-dot" style="background:#f59e0b"></div>
+          <div class="d-dot" style="background:#22c55e"></div>
+          <span class="demo-url">surfaceos.io/demo — Line 1 · Acuity Brands · Powder Coating</span>
+        </div>
+        <iframe src="./demo.html" title="SurfaceOS — Live Demo"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  IMPLEMENTACIÓN
+══════════════════════════════════════ -->
+<section id="impl">
+  <div class="wrap">
+    <div class="s-hdr fu">
+      <span class="label-tag">Implementation</span>
+      <h2>Plan de implementación<br>for Acuity Brands.</h2>
+      <p class="s-intro">Two lines, two days of installation, sin detener producción. Each line receives custom sensor configuration, umbrales de alerta, y paneles de visualización.</p>
+    </div>
+    <div class="impl-tbl fu">
+      <!-- Header -->
+      <div class="impl-row impl-hdr">
+        <div class="impl-cell" style="font-size:12px;font-weight:600;color:var(--ink-3)">Line</div>
+        <div class="impl-cell" style="font-size:12px;font-weight:600;color:var(--ink-3)">Monitored variables</div>
+        <div class="impl-cell" style="font-size:12px;font-weight:600;color:var(--ink-3);text-align:center">Points</div>
+        <div class="impl-cell" style="font-size:12px;font-weight:600;color:var(--ink-3);text-align:center">Install</div>
+      </div>
+      <!-- L1 -->
+      <div class="impl-row">
+        <div class="impl-cell">
+          <div class="impl-lname">Line 1</div>
+          <div class="impl-ltype">ELECTROSTATIC POWDER COATING</div>
+        </div>
+        <div class="impl-cell">
+          <div style="margin-bottom:8px;display:flex;flex-wrap:wrap">
+            <span class="vtag">pH Cleaner</span><span class="vtag">T° Cleaner</span><span class="vtag">pH Phosphate</span><span class="vtag">T° Phosphate</span><span class="vtag">Rinse Cond. ×3</span><span class="vtag">Dry-off T°</span><span class="vtag">Gun voltage</span><span class="vtag">Booth humidity</span><span class="vtag">PMT Cure oven</span><span class="vtag">Chain speed</span><span class="vtag">DFT thickness</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--ink-3)">Zinc phosphate · Polyester powder · AAMA 2604 · Qualicoat</div>
+        </div>
+        <div class="impl-cell" style="text-align:center;vertical-align:middle">
+          <span class="impl-big">28</span>
+          <span class="impl-sub">sensors</span>
+        </div>
+        <div class="impl-cell" style="text-align:center;vertical-align:middle">
+          <span class="impl-big">1</span>
+          <span class="impl-sub">business day</span>
+        </div>
+      </div>
+      <!-- L2 -->
+      <div class="impl-row">
+        <div class="impl-cell">
+          <div class="impl-lname">Line 2</div>
+          <div class="impl-ltype">ELECTROSTATIC POWDER COATING</div>
+        </div>
+        <div class="impl-cell">
+          <div style="margin-bottom:8px;display:flex;flex-wrap:wrap">
+            <span class="vtag">pH Cleaner</span><span class="vtag">T° Cleaner</span><span class="vtag">pH Phosphate</span><span class="vtag">T° Phosphate</span><span class="vtag">Rinse Cond. ×3</span><span class="vtag">Dry-off T°</span><span class="vtag">Gun voltage</span><span class="vtag">Booth humidity</span><span class="vtag">PMT Cure oven</span><span class="vtag">Chain speed</span><span class="vtag">DFT thickness</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--ink-3)">Zinc phosphate · Polyester powder · AAMA 2604 · Qualicoat</div>
+        </div>
+        <div class="impl-cell" style="text-align:center">
+          <span class="impl-big">28</span>
+          <span class="impl-sub">sensors</span>
+        </div>
+        <div class="impl-cell" style="text-align:center">
+          <span class="impl-big">1</span>
+          <span class="impl-sub">business day</span>
+        </div>
+      </div>
+    </div>
+    <div class="impl-totals fu">
+      <div class="tot-it"><span class="tot-n">56</span><span class="tot-l">Total measurement points</span></div>
+      <div class="tot-it"><span class="tot-n">2</span><span class="tot-l">Days to full installation</span></div>
+      <div class="tot-it"><span class="tot-n">0</span><span class="tot-l">Hours of lost production</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  ROADMAP
+══════════════════════════════════════ -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="s-hdr fu">
+      <span class="label-tag">Roadmap</span>
+      <h2>Increasing value over time.</h2>
+      <p class="s-intro">SurfaceOS is not a one-time implementation project: it is a platform that grows with your operation. Each phase adds capabilities without replacing what came before.</p>
+    </div>
+    <div class="tl fu">
+      <div class="tl-line"></div>
+      <div class="tl-g">
+        <div class="phase">
+          <div class="ph-dot active">1</div>
+          <div class="ph-period">Mes 1 – 2</div>
+          <h3 class="ph-title">Visibilidad</h3>
+          <p class="ph-sub">The foundation. The system sees everything happening on your lines from day one.</p>
+          <ul class="ph-list">
+            <li>Sensor installation on both lines</li>
+            <li>Live dashboard accessible from any device</li>
+            <li>Alerts configured by threshold and variable</li>
+            <li>Failure capture: photo + variables + response time</li>
+            <li>Lot traceability operational from day one</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="ph-dot next">2</div>
+          <div class="ph-period">Mes 3 – 6</div>
+          <h3 class="ph-title">Inteligencia</h3>
+          <p class="ph-sub">The system learns from your operation and starts predicting before failures occur.</p>
+          <ul class="ph-list">
+            <li>Correlación automática condición → falla</li>
+            <li>Predictive alerts — notifies before failure</li>
+            <li>AMEF auto-actualizado con cada incidente</li>
+            <li>Patrones por turno, proveedor y condición ambiental</li>
+            <li>Reportes automáticos para calidad y dirección</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="ph-dot">3</div>
+          <div class="ph-period">Mes 6+</div>
+          <h3 class="ph-title">Operador Digital</h3>
+          <p class="ph-sub">El sistema actúa como un operador experto permanente, disponible en todos los turnos.</p>
+          <ul class="ph-list">
+            <li>Recomendaciones basadas en casos similares anteriores</li>
+            <li>Predicción de riesgo de falla antes de salir de línea</li>
+            <li>Certificado de proceso exportable para auditorías</li>
+            <li>Optimización continua de parámetros operativos</li>
+            <li>Base de conocimiento transferible entre turnos</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  BENEFICIOS POR ROL
+══════════════════════════════════════ -->
+<section id="roles">
+  <div class="wrap">
+    <div class="s-hdr fu">
+      <span class="label-tag">Value by role</span>
+      <h2>Specific value for every<br>level of your organization.</h2>
+    </div>
+    <div class="roles-g">
+      <div class="role-card fu fu-1">
+        <span class="role-badge rb-dir">Finishing Operations</span>
+        <h3 class="role-t">For Operations Leadership</h3>
+        <p class="role-p">Finishing Manager · Plant Director</p>
+        <ul class="role-pts">
+          <li>Executive visibility of both coating lines without walking the floor</li>
+          <li>Quality, scrap, and MTTR KPIs by line and by shift</li>
+          <li>Decisions based on real-time data, not retrospective reports</li>
+          <li>Continuous improvement evidence to report to plant management</li>
+        </ul>
+      </div>
+      <div class="role-card fu fu-2">
+        <span class="role-badge rb-cal">Calidad</span>
+        <h3 class="role-t">For the Quality team</h3>
+        <p class="role-p">Quality Manager · Process Inspector</p>
+        <ul class="role-pts">
+          <li>Live FMEA that updates with every documented incident</li>
+          <li>Per-lot process certificate exportable for customer audits</li>
+          <li>Evidence ready for ISO 9001, IATF 16949, and AAMA audits</li>
+          <li>Full traceability with no additional manual work</li>
+        </ul>
+      </div>
+      <div class="role-card fu fu-3">
+        <span class="role-badge rb-op">Operación</span>
+        <h3 class="role-t">For the Operations team</h3>
+        <p class="role-p">Shift Supervisor · Line Operators</p>
+        <ul class="role-pts">
+          <li>Early alerts before scrap is generated</li>
+          <li>Expert knowledge documented and always available</li>
+          <li>Significantly faster onboarding for new operators</li>
+          <li>Response time visible as a team metric</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  CTA FINAL
+══════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="wrap">
+    <span class="cta-eyebrow">Next step</span>
+    <h2>Ready to install<br>on your lines.</h2>
+    <p class="cta-body">SurfaceOS installation across your 2 lines takes 2 days (one per line) without stopping production. In 2 weeks the system is live and capturing data. In 60 days you have your first ROI metric comparing response time and scrap before and after.</p>
+    <button onclick="openModal()" class="btn btn-inv btn-xl">Schedule a plant visit</button>
+    <p class="cta-note">Or reply to this email with a convenient date. We respond the same business day.</p>
+    <div class="contacts">
+      <div class="ct-it">
+        <span class="ct-l">Founder</span>
+        <span class="ct-v">Hernán Treviño</span>
+      </div>
+      <div class="ct-it">
+        <span class="ct-l">Email</span>
+        <span class="ct-v"><a href="mailto:htrevinopre@gmail.com">htrevinopre@gmail.com</a></span>
+      </div>
+      <div class="ct-it">
+        <span class="ct-l">WhatsApp</span>
+        <span class="ct-v"><a href="https://wa.me/521XXXXXXXXXX" target="_blank">Write to us directly</a></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="ft-in">
+    <a href="#" class="ft-logo">
+      <div class="logo-mark" style="background:rgba(255,255,255,.1)">◈</div>
+      <span style="font-size:15px;font-weight:700;color:rgba(255,255,255,.5)">SurfaceOS</span>
+    </a>
+    <span class="ft-copy">© 2026 SurfaceOS</span>
+    <span class="ft-line">Operador digital para líneas industriales de tratamiento de superficies metálicas.</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+  MODAL
+══════════════════════════════════════ -->
+<div class="modal-bg" id="modal" onclick="handleOvClick(event)">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <h2 class="modal-h">Schedule a visit</h2>
+    <p class="modal-sub">We'll schedule a visit to your Acuity Brands facility to walk through the proposal and define the installation plan.</p>
+    <form onsubmit="submitForm(event)">
+      <div class="f2">
+        <div class="fg">
+          <label class="fl">Full name</label>
+          <input type="text" class="fi" id="fName" placeholder="Your name" required>
+        </div>
+        <div class="fg">
+          <label class="fl">Company</label>
+          <input type="text" class="fi" id="fCompany" value="Acuity Brands">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Email</label>
+        <input type="email" class="fi" id="fEmail" placeholder="you@acuitybrands.com" required>
+      </div>
+      <div class="f2">
+        <div class="fg">
+          <label class="fl">Phone</label>
+          <input type="tel" class="fi" id="fPhone" placeholder="+1 (000) 000-0000">
+        </div>
+        <div class="fg">
+          <label class="fl">Preferred visit date</label>
+          <input type="date" class="fi" id="fDate">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Message (optional)</label>
+        <textarea class="ft" id="fMsg" placeholder="Any specific questions about the proposal or the lines to evaluate?"></textarea>
+      </div>
+      <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;padding:13px 0;font-size:15px">Send visit request</button>
+    </form>
+  </div>
+</div>
+
+<script>
+// Header scroll
+const hdr = document.getElementById('hdr');
+window.addEventListener('scroll', () => hdr.classList.toggle('solid', scrollY > 20), {passive:true});
+
+// Hamburger
+function toggleHam(){
+  const btn=document.getElementById('hamBtn'),nav=document.getElementById('mobNav');
+  btn.classList.toggle('open');nav.classList.toggle('open');
+  document.body.style.overflow=nav.classList.contains('open')?'hidden':'';
+}
+function closeHam(){
+  document.getElementById('hamBtn').classList.remove('open');
+  document.getElementById('mobNav').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// Modal
+function openModal(){closeHam();document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden'}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow=''}
+function handleOvClick(e){if(e.target===document.getElementById('modal'))closeModal()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()})
+
+function submitForm(e){
+  e.preventDefault();
+  const n=document.getElementById('fName').value;
+  const co=document.getElementById('fCompany').value;
+  const em=document.getElementById('fEmail').value;
+  const ph=document.getElementById('fPhone').value;
+  const da=document.getElementById('fDate').value;
+  const ms=document.getElementById('fMsg').value;
+  const sub=encodeURIComponent(`SurfaceOS plant visit request — ${co}`);
+  const bod=encodeURIComponent(`Nombre: ${n}\nEmpresa: ${co}\nEmail: ${em}\nTeléfono: ${ph}\nFecha tentativa: ${da}\n\nMensaje:\n${ms}`);
+  window.location.href=`mailto:htrevinopre@gmail.com?subject=${sub}&body=${bod}`;
+  closeModal();
+}
+
+// Fade-up intersection observer
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{if(en.isIntersecting)en.target.classList.add('in')})
+},{threshold:.1});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
