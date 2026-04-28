@@ -1460,7 +1460,389 @@ function sendChat() {
 }
 
 function generatePDF() {
-  alert('📄 Generando Reporte de Auditoría ISO...\n\nEl reporte incluye:\n• Trazabilidad completa de 4 lotes\n• Registros de titulación del turno\n• Historial de alertas y tiempos de respuesta\n• Parámetros críticos: pH, PMT, Cond. DI\n• FPY por lote con evidencia de defectos\n• Firma digital del inspector\n• Sello de cumplimiento: ISO 9001 · IATF 16949 · Qualicoat\n\n✓ PDF generado · Listo para auditor');
+  const btn = document.querySelector('.audit-btn');
+  if (btn) { btn.innerHTML = '⏳ Generando PDF...'; btn.disabled = true; }
+
+  function loadScripts(urls, cb) {
+    if (!urls.length) { cb(); return; }
+    if (document.querySelector(`script[src="${urls[0]}"]`)) { loadScripts(urls.slice(1), cb); return; }
+    const s = document.createElement('script');
+    s.src = urls[0];
+    s.onload = () => loadScripts(urls.slice(1), cb);
+    s.onerror = () => { if(btn){btn.innerHTML='📄 Generar PDF de Auditoría ISO';btn.disabled=false;} alert('Error cargando librería PDF. Verifica tu conexión a internet.'); };
+    document.head.appendChild(s);
+  }
+
+  const libs = [];
+  if (!window.jspdf) libs.push('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  if (!window.jspdf?.API?.autoTable) libs.push('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+
+  loadScripts(libs, () => {
+    if (btn) { btn.innerHTML = '📄 Generar PDF de Auditoría ISO'; btn.disabled = false; }
+    buildAuditPDF();
+  });
+}
+
+function buildAuditPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const PW = 210, M = 16, CW = PW - M * 2;
+  const ACCENT  = [0, 82, 204];
+  const DARK    = [15, 20, 30];
+  const MUTED   = [100, 116, 139];
+  const GREEN   = [22, 163, 74];
+  const YELLOW  = [160, 90, 0];
+  const RED     = [180, 30, 30];
+  const LIGHT   = [247, 250, 252];
+  const BORDER  = [218, 218, 220];
+  const ACCENTL = [235, 242, 255];
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('es-MX', { day:'2-digit', month:'2-digit', year:'numeric' });
+  const timeStr = now.toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
+
+  let y = 0;
+
+  /* ─── helpers ─── */
+  function hdr(label) {
+    if (y > 252) { doc.addPage(); miniHdr(); }
+    doc.setFillColor(...ACCENT);
+    doc.rect(M, y, CW, 6.5, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.text(label.toUpperCase(), M + 3, y + 4.6);
+    y += 9;
+    doc.setTextColor(...DARK);
+    doc.setFont('helvetica', 'normal');
+  }
+
+  function miniHdr() {
+    doc.setFillColor(...ACCENT);
+    doc.rect(0, 0, PW, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.text('SurfaceOS · Reporte de Auditoría de Proceso · Continuación', M, 6.5);
+    doc.setFont('helvetica', 'normal');
+    doc.text(dateStr + ' ' + timeStr, PW - M, 6.5, { align: 'right' });
+    y = 16;
+    doc.setTextColor(...DARK);
+  }
+
+  /* ══════════════════ PÁGINA 1 ══════════════════ */
+
+  /* Header principal */
+  doc.setFillColor(...ACCENT);
+  doc.rect(0, 0, PW, 30, 'F');
+
+  /* Logo mark */
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(M, 8.5, 10, 10, 2, 2, 'F');
+  doc.setTextColor(...ACCENT);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text('S', M + 5, 15, { align: 'center' });
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(17);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SurfaceOS', M + 13, 15);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('REPORTE DE AUDITORÍA DE PROCESO', M + 13, 21.5);
+
+  doc.setFontSize(7.5);
+  doc.text('Generado: ' + dateStr + '  ' + timeStr, PW - M, 11, { align: 'right' });
+  doc.text('Línea 1 · Pintura en Polvo Electrostático', PW - M, 17, { align: 'right' });
+  doc.text('Turno Matutino  06:00 – 14:00', PW - M, 23, { align: 'right' });
+
+  y = 34;
+
+  /* Fila de certificaciones */
+  doc.setFillColor(...LIGHT);
+  doc.setDrawColor(...BORDER);
+  doc.rect(M, y, CW, 8.5, 'FD');
+  const stds = ['ISO 9001:2015','IATF 16949:2016','Qualicoat Cl.1','ASTM D3359','ASTM B117','AAMA 2604'];
+  const sw = CW / stds.length;
+  stds.forEach((s, i) => {
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...GREEN);
+    doc.text('✓ ' + s, M + sw * i + sw / 2, y + 5.5, { align: 'center' });
+  });
+  y += 13;
+
+  /* AMEF */
+  hdr('Análisis de Modo y Efecto de Falla (AMEF)  ·  NPR = Severidad × Ocurrencia × Detección');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M },
+    styles: { fontSize: 7.5, cellPadding: 2.2, lineColor: BORDER, lineWidth: 0.2, textColor: DARK },
+    headStyles: { fillColor: ACCENTL, textColor: ACCENT, fontStyle: 'bold', fontSize: 7 },
+    alternateRowStyles: { fillColor: [250, 251, 255] },
+    columnStyles: { 2:{halign:'center'}, 3:{halign:'center'}, 4:{halign:'center'}, 5:{halign:'center',fontStyle:'bold'} },
+    head: [['Modo de Falla','Efecto potencial','S','O','D','NPR','Estado']],
+    body: [
+      ['pH fosfatado > 5.6',   'Capa porosa, baja adherencia',       '8','6','2','96',  'Monitorear'],
+      ['Cond. DI > 30 µS/cm',  'Residuo iónico / ampollamiento',     '9','4','2','288', 'Acción inmediata'],
+      ['PMT horno < 188°C',    'Subcurado / adhesión y dureza',      '9','3','3','243', 'Plan de acción'],
+      ['Fe disuelto > 0.4%',   'Capa gris polvosa, tono irregular',  '7','3','4','84',  'Bajo control'],
+      ['Humedad cabina > 70%', 'Micro-poros (outgassing)',            '8','2','3','48',  'Bajo control'],
+      ['Contaminación silicón','Ojo de pez (fisheye)',                '9','2','6','108', 'Protocolo limpieza'],
+    ],
+    didParseCell: (d) => {
+      if (d.section !== 'body') return;
+      if (d.column.index === 5) {
+        const v = parseInt(d.cell.text[0]);
+        d.cell.styles.textColor = v >= 200 ? RED : v >= 100 ? YELLOW : GREEN;
+      }
+      if (d.column.index === 6) {
+        const t = d.cell.text[0];
+        d.cell.styles.textColor = t === 'Acción inmediata' ? RED : (t === 'Plan de acción'||t === 'Monitorear'||t === 'Protocolo limpieza') ? YELLOW : GREEN;
+        d.cell.styles.fontStyle = 'bold';
+      }
+    },
+  });
+  y = doc.lastAutoTable.finalY + 3;
+  doc.setFontSize(6.5); doc.setTextColor(...MUTED);
+  doc.text('S = Severidad  ·  O = Ocurrencia  ·  D = Detección (escala 1–10)   |   NPR ≥ 200: Acción inmediata  ·  NPR 100–199: Plan de acción  ·  NPR < 100: Monitorear', M, y);
+  y += 5;
+
+  /* Catálogo de defectos */
+  hdr('Catálogo de Defectos — Nomenclatura de Industria');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M },
+    styles: { fontSize: 7.2, cellPadding: 2, lineColor: BORDER, lineWidth: 0.2 },
+    headStyles: { fillColor: ACCENTL, textColor: ACCENT, fontStyle: 'bold', fontSize: 7 },
+    alternateRowStyles: { fillColor: [250, 251, 255] },
+    columnStyles: { 4:{halign:'center'} },
+    head: [['Defecto','Nombre técnico (EN)','Variable raíz','Norma ref.','Turno']],
+    body: [
+      ['Ampollamiento',       'Blistering',         'Cond. DI alta / humedad',  'ASTM D714',  '0'],
+      ['Falta de adherencia', 'Poor adhesion',      'pH fosfato, Fe alto',      'ASTM D3359', '3'],
+      ['Ojo de pez',          'Fisheye/Cratering',  'Silicón / aceite residual','ISO 4623',   '0'],
+      ['Cáscara de naranja',  'Orange peel',        'PMT, fosfato irregular',   'ISO 8503',   '1'],
+      ['Micro-poros',         'Pinholes/Outgassing','Humedad / espesor exc.',   'ISO 2409',   '0'],
+      ['Subcurado',           'Undercure',          'PMT < 188°C o t < 10 min', 'MEK Rub',    '3'],
+    ],
+    didParseCell: (d) => {
+      if (d.section !== 'body' || d.column.index !== 4) return;
+      const v = parseInt(d.cell.text[0]);
+      d.cell.styles.textColor = v > 0 ? YELLOW : GREEN;
+      d.cell.styles.fontStyle = 'bold';
+    },
+  });
+  y = doc.lastAutoTable.finalY + 4;
+
+  /* ══════════════════ PÁGINA 2 ══════════════════ */
+  doc.addPage();
+  miniHdr();
+
+  /* Titulaciones */
+  hdr('Registro de Titulaciones — Turno Matutino  ·  Último análisis: 10:30 AM · Op. Torres');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M },
+    styles: { fontSize: 7, cellPadding: 2, lineColor: BORDER, lineWidth: 0.2 },
+    headStyles: { fillColor: ACCENTL, textColor: ACCENT, fontStyle: 'bold', fontSize: 6.5 },
+    alternateRowStyles: { fillColor: [250, 251, 255] },
+    head: [['Hora','Baño','pH','Ác. Libre / Conc.','Ác. Total','Fe / Parámetro','Conductividad','Acción']],
+    body: [
+      ['06:15','Desengrase',            '10.6','—',           'Alc: 13.1 p.t.','—',         '—',           'Sin novedad'],
+      ['10:30','Desengrase',            '10.4','—',           'Alc: 12.4 p.t.','—',         '—',           'Sin novedad'],
+      ['06:15','Sello 1 · Fosfatado',  '4.95','0.81%',       '1.74%',         'Fe: 0.22%', '1,580 µS/cm', 'Sin novedad'],
+      ['08:30','Sello 1 · Fosfatado',  '5.12','0.76%',       '1.79%',         'Fe: 0.28%', '1,610 µS/cm', 'Sin novedad'],
+      ['10:30','Sello 1 · Fosfatado',  '5.32','0.74%',       '1.82%',         'Fe: 0.31%', '1,640 µS/cm', 'Ajuste preventivo'],
+      ['08:30','Sello 2 · Pasivado Zr','4.30','Zr: 142 ppm', '—',             '—',         '920 µS/cm',   'Sin novedad'],
+      ['10:30','Enjuague 2',            '5.80','—',           '—',             '—',         '188 µS/cm',   'Sin novedad'],
+    ],
+    didParseCell: (d) => {
+      if (d.section !== 'body' || d.column.index !== 7) return;
+      const t = d.cell.text[0];
+      d.cell.styles.textColor = t === 'Ajuste preventivo' ? YELLOW : GREEN;
+      d.cell.styles.fontStyle = 'bold';
+    },
+  });
+  y = doc.lastAutoTable.finalY + 5;
+
+  /* Trazabilidad */
+  hdr('Trazabilidad de Lotes — Turno Matutino');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M },
+    styles: { fontSize: 7, cellPadding: 2, lineColor: BORDER, lineWidth: 0.2 },
+    headStyles: { fillColor: ACCENTL, textColor: ACCENT, fontStyle: 'bold', fontSize: 6.5 },
+    alternateRowStyles: { fillColor: [250, 251, 255] },
+    columnStyles: { 2:{halign:'center'}, 6:{halign:'center',fontStyle:'bold'} },
+    head: [['Lote','Inicio','Piezas','pH Fosf. min/máx','PMT Pico','Inmersión','FPY','Inspector','Estado']],
+    body: [
+      ['L-2024-0889','06:10','152','4.98 / 5.08','197°C','5:18','100%',  'Ing. Martínez','Aprobado'],
+      ['L-2024-0890','07:55','148','5.02 / 5.15','198°C','5:22','99.3%', 'Op. Torres',   'Aprobado'],
+      ['L-2024-0891','09:40','145','5.10 / 5.28','189°C','5:14','97.9%', 'Op. Torres',   'En revisión'],
+      ['L-2024-0892','11:25','149','5.18 / 5.32','198°C','5:20','99.3%', 'Ing. Martínez','Aprobado'],
+      ['L-2024-0893','En proceso','—','5.25 / 5.32','—','—','—','Ing. Martínez','En proceso'],
+    ],
+    didParseCell: (d) => {
+      if (d.section !== 'body') return;
+      if (d.column.index === 8) {
+        const t = d.cell.text[0];
+        d.cell.styles.textColor = t === 'En revisión' ? YELLOW : t === 'Aprobado' ? GREEN : [59,130,246];
+        d.cell.styles.fontStyle = 'bold';
+      }
+      if (d.column.index === 6) {
+        const v = parseFloat(d.cell.text[0]);
+        if (!isNaN(v)) d.cell.styles.textColor = v >= 99 ? GREEN : YELLOW;
+      }
+      if (d.row.index === 2) d.cell.styles.fillColor = [255, 252, 235];
+    },
+  });
+  y = doc.lastAutoTable.finalY + 3;
+  doc.setFontSize(6.5); doc.setTextColor(...MUTED);
+  doc.text('⚠ Lote L-2024-0891: PMT bajó a 189°C por apertura de puerta a las 10:02 AM. 3 piezas separadas para prueba MEK Rub + ASTM D3359.', M, y);
+  y += 5;
+
+  /* Alertas del turno */
+  hdr('Resumen de Alertas — Turno Matutino');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M },
+    styles: { fontSize: 7, cellPadding: 2.2, lineColor: BORDER, lineWidth: 0.2 },
+    headStyles: { fillColor: ACCENTL, textColor: ACCENT, fontStyle: 'bold', fontSize: 7 },
+    alternateRowStyles: { fillColor: [250, 251, 255] },
+    columnStyles: { 0:{fontStyle:'bold'} },
+    head: [['Estado','Descripción de la alerta','Detalle / MTTR']],
+    body: [
+      ['⚠ Activa',   'pH Fosfatado en tendencia ascendente: 5.32 / Límite 5.50',             'Línea 1 · 10:52 AM · +0.08 pH/h · Proyección: ~1.8h'],
+      ['⚠ Activa',   'Fe disuelto en fosfatado: 0.31% (límite: 0.40%)',                       'Línea 1 · 10:30 AM · MTTR: 8 min 12s'],
+      ['✓ Resuelta', 'Conductividad Enjuague DI normalizada: 18 µS/cm',                       'Línea 1 · 09:15 AM · Regeneración resina DI · MTTR: 4 min 02s'],
+      ['✓ Resuelta', 'PMT Zona 2 horno restituida: 198°C / Set: 200°C ±10°C',                 'Línea 1 · 08:05 AM · Revisión resistencia Z2 · MTTR: 3 min 41s'],
+      ['✓ Resuelta', 'Nivel desengrase repuesto: 74% → 88%',                                  'Línea 1 · 07:10 AM · MTTR: 2 min 58s'],
+    ],
+    didParseCell: (d) => {
+      if (d.section !== 'body' || d.column.index !== 0) return;
+      d.cell.styles.textColor = d.cell.text[0].includes('Activa') ? YELLOW : GREEN;
+    },
+  });
+  y = doc.lastAutoTable.finalY + 5;
+
+  /* KPIs */
+  hdr('Indicadores Clave de Desempeño (KPIs) — Turno Matutino');
+  doc.autoTable({
+    startY: y, margin: { left: M, right: M },
+    styles: { fontSize: 7.5, cellPadding: 2.5, lineColor: BORDER, lineWidth: 0.2 },
+    headStyles: { fillColor: ACCENTL, textColor: ACCENT, fontStyle: 'bold', fontSize: 7 },
+    alternateRowStyles: { fillColor: [250, 251, 255] },
+    head: [['Indicador','Valor del turno','Meta','Δ vs. meta']],
+    body: [
+      ['OEE (Eficiencia Global)',  '84%',          '≥ 85%',       'Δ −1%'],
+      ['FPY (First Pass Yield)',   '97.8%',        '≥ 98%',       '27 piezas rechazadas'],
+      ['MTTR Promedio',            '3:58 min',     '< 8:00 min',  '50% bajo meta ✓'],
+      ['Costo de Scrap (turno)',   '$4,320 MXN',   'Ref: $6,100', '↓ 29% vs. promedio'],
+    ],
+    didParseCell: (d) => {
+      if (d.section !== 'body' || d.column.index !== 3) return;
+      const t = d.cell.text[0];
+      d.cell.styles.textColor = t.includes('✓') || t.includes('↓') ? GREEN : YELLOW;
+      d.cell.styles.fontStyle = 'bold';
+    },
+  });
+  y = doc.lastAutoTable.finalY + 4;
+
+  /* ══════════════════ PÁGINA 3 ══════════════════ */
+  doc.addPage();
+  doc.setFillColor(...ACCENT);
+  doc.rect(0, 0, PW, 10, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SurfaceOS · Reporte de Auditoría de Proceso · Firmas y Sello de Cumplimiento', M, 6.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Página 3 de 3', PW - M, 6.5, { align: 'right' });
+  y = 16;
+
+  /* Resumen ejecutivo */
+  hdr('Resumen Ejecutivo del Turno');
+  doc.setFillColor(...LIGHT);
+  doc.setDrawColor(...BORDER);
+  doc.rect(M, y, CW, 26, 'FD');
+  const summary = [
+    'Lotes procesados: 4  ·  3 aprobados  ·  1 en revisión (L-2024-0891)',
+    'Piezas totales procesadas: 594  ·  Rechazadas: 27  ·  FPY turno: 97.8%',
+    'Alertas activas al cierre: 2  (pH fosfatado / Fe disuelto en fosfatado)',
+    'Alertas resueltas en turno: 3  ·  MTTR promedio: 3:58 min  (meta: < 8:00 min)',
+    'Sensores operativos: 28/28  ·  Gateway GT100 en línea  ·  Sin fallas de instrumentación',
+  ];
+  summary.forEach((line, i) => {
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(...DARK);
+    doc.text('·  ' + line, M + 4, y + 7 + i * 4.4);
+  });
+  y += 30;
+
+  /* Observaciones */
+  hdr('Observaciones del Turno y Acciones Pendientes');
+  doc.setFontSize(8); doc.setTextColor(...DARK); doc.setFont('helvetica', 'normal');
+  const obs = [
+    '• El lote L-2024-0891 registró PMT de 189°C (límite inferior: 190°C) por apertura de puerta del horno a las 10:02 AM.',
+    '  3 piezas fueron separadas para prueba MEK Rub + adhesión cruzada ASTM D3359. Resultados pendientes.',
+    '• Se recomienda ajuste preventivo del pH de fosfatado al inicio del turno vespertino (dosificación ácida según curva de titulación).',
+    '• Programar regeneración de resina DI en los próximos 2 días. Conductividad DI en 18 µS/cm y en tendencia ascendente.',
+    '• El electrodo de pH del fosfatado requiere recalibración en 4 días. Deriva de +0.02 pH/día detectada.',
+  ];
+  obs.forEach((line, i) => {
+    doc.text(line, M, y + i * 5);
+  });
+  y += obs.length * 5 + 5;
+
+  /* Firmas */
+  hdr('Firmas de Responsables');
+  const sigW = (CW - 12) / 3;
+  const sigBoxes = [
+    { role: 'Inspector de Calidad',    extra: 'No. credencial: ____________' },
+    { role: 'Jefe de Turno',           extra: 'Turno Matutino 06:00–14:00' },
+    { role: 'Ingeniero de Proceso',    extra: 'Línea 1 · GT100 activo' },
+  ];
+  sigBoxes.forEach((b, i) => {
+    const bx = M + i * (sigW + 6);
+    doc.setFillColor(248, 250, 255);
+    doc.setDrawColor(...BORDER);
+    doc.rect(bx, y, sigW, 30, 'FD');
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(...ACCENT);
+    doc.text(b.role, bx + sigW / 2, y + 7, { align: 'center' });
+    doc.setDrawColor(190, 190, 190);
+    doc.line(bx + 5, y + 20, bx + sigW - 5, y + 20);
+    doc.setFontSize(6.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(...MUTED);
+    doc.text('Firma y fecha', bx + sigW / 2, y + 24, { align: 'center' });
+    doc.text(b.extra, bx + sigW / 2, y + 28.5, { align: 'center' });
+  });
+  y += 36;
+
+  /* Sello de cumplimiento */
+  doc.setFillColor(...ACCENT);
+  doc.roundedRect(M, y, CW, 22, 3, 3, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('PROCESO CERTIFICADO — SURFACEOS', PW / 2, y + 8.5, { align: 'center' });
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text('ISO 9001:2015  ·  IATF 16949:2016  ·  Qualicoat Clase 1  ·  ASTM D3359  ·  ASTM B117  ·  AAMA 2604', PW / 2, y + 15.5, { align: 'center' });
+  y += 26;
+
+  /* Pie de página disclaimer */
+  doc.setFontSize(6.5); doc.setFont('helvetica', 'italic'); doc.setTextColor(...MUTED);
+  doc.text('Este documento fue generado automáticamente por SurfaceOS a partir de los datos capturados por el Gateway GT100 durante el turno indicado.', PW / 2, y + 4, { align: 'center' });
+  doc.text('Los datos de titulación, variables de proceso y trazabilidad de lotes fueron registrados en tiempo real. Documento válido para auditoría ISO/IATF.', PW / 2, y + 9, { align: 'center' });
+
+  /* Números de página en todas las páginas */
+  const total = doc.getNumberOfPages();
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p);
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(...MUTED);
+    doc.text('SurfaceOS · Reporte de Auditoría · ' + dateStr, M, 293);
+    doc.text('Página ' + p + ' de ' + total, PW - M, 293, { align: 'right' });
+  }
+
+  /* Guardar */
+  const fname = 'SurfaceOS_Auditoria_' + dateStr.replace(/\//g, '-') + '_T-Matutino.pdf';
+  doc.save(fname);
 }
 
 /* ══════════════════════════════════
